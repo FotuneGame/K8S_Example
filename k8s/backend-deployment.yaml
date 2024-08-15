@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  progressDeadlineSeconds: 30
+  selector:
+    matchLabels:
+      app: geter
+      tier: backend
+      track: stable
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: geter
+        tier: backend
+        track: stable
+    spec:
+      containers:
+        - name: geter
+          image: grigorytitov/k8s_test_backend:v1
+          ports:
+            - name: http
+              containerPort: 3001
