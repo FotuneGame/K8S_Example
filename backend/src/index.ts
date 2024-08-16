@@ -5,25 +5,40 @@ import ApiError from "./error/ApiError";
 import errorWare from "./middleware/errorWare";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
+import fs_promises from "fs/promises";
 
 
 
 const PORT = process.env.PORT || 3001
 const ULR_CORS  = process.env.ULR_CORS || ['http://localhost:3000']
+const STATIC_PATH_FILE = path.resolve(__dirname,"..","static","test.txt")
 
 const app:Express = express();
 const router:Router = express.Router();
 
 
 
-router.get("/get",(req:Request,res:Response,next:NextFunction)=>{
-    
+router.get("/get",async (req:Request,res:Response,next:NextFunction)=>{
     const {random} = req.query;
     if (!random || !Number(random)) return next(ApiError.badRequest("Get","Have NOT random value in query"));
 
     // делаем массив из 100 чисел (заполняем значения индексами), затем преобразуем каждый элемент в строку
     const array = ["Длинна: " + random,...Array.from(Array(Number(random)).keys()).map((a)=>"element "+a)];
-    res.send(array);
+
+    try{
+        if(!fs.existsSync(STATIC_PATH_FILE)){
+            await fs_promises.writeFile(STATIC_PATH_FILE, new Date().toDateString());
+            res.send(["Данные записаны в файл (volumes)",...array]);
+        }
+        else {
+            const file_data = await fs_promises.readFile(STATIC_PATH_FILE, { encoding: 'utf8' });
+            res.send(["Данные из файла (volumes): "+file_data,...array]);
+        }
+    }catch{
+        return next(ApiError.noUploadFile("Get","Can`t load or read file((("));
+    }
+
 });
 
 

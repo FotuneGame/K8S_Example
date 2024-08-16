@@ -4,4 +4,4 @@
 
 комманда для контейнера
 
-    docker run  -p 80:3000 -d --name frontend frontend:v1
+    docker run  -p 80:3000 -d --name frontend grigorytitov/k8s_test_frontend:v1
